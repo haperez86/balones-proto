@@ -194,8 +194,6 @@ function applyRole(){
     button.classList.toggle('hidden',!allowed);
   });
   document.querySelector('.nav').classList.toggle('seller-nav',sellerMode);
-  const posLabel=document.querySelector('.nav button[data-page="pos"] .nav-label');
-  if(posLabel)posLabel.textContent=sellerMode?'Caja':'Caja POS';
   $('posSeller').value=sellerMode?'Vendedor demo':'Administrador demo';
   const currentPage=document.querySelector('.page:not(.hidden)')?.id;
   if(sellerMode&&!['dashboard','pos'].includes(currentPage))show('dashboard');
