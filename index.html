@@ -116,6 +116,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 .pos-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.85fr);gap:15px}.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product-tile{border:1px solid var(--line);border-radius:10px;padding:13px;background:#fff;text-align:left;cursor:pointer}.product-tile:disabled{opacity:.45;cursor:not-allowed}.product-tile strong{display:block;margin-bottom:5px}.product-tile small{color:var(--muted)}.cart-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid #edf1f5}.cart-controls{display:flex;align-items:center;gap:6px}.cart-controls button{border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:4px 8px;cursor:pointer}.total-line{display:flex;justify-content:space-between;padding:9px 0;font-size:14px}.total-line.grand{font-size:20px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:14px}.status-open{color:#13734f;font-weight:800}.status-closed{color:#b45309;font-weight:800}
 @media(max-width:800px){.pos-layout{grid-template-columns:1fr}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top-tools{gap:5px}.role-select{max-width:130px;font-size:11px}}
 @media(max-width:380px){.product-grid{grid-template-columns:1fr}.top-tools .tag{display:none}}
+
+/* Menú reducido para el perfil vendedor: solo acceso al punto de venta */
+@media(max-width:700px){.nav.seller-nav{grid-template-columns:1fr;justify-items:center}.nav.seller-nav button{width:100%;max-width:120px}}
 </style></head><body><div class="app"><aside class="side"><div class="brand">PROTO INVENTARIO<small>Control de almacén y ventas</small></div><nav class="nav">
 <button class="active" data-page="dashboard"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></button>
 <button data-page="products"><span class="nav-icon">▦</span><span class="nav-label">Productos</span></button>
@@ -161,7 +164,17 @@ const cashDenominations=[100000,50000,20000,10000,5000,2000,1000,500,200,100,50]
 sales.forEach(s=>{if(!s.payment)s.payment='Efectivo';if(!s.seller)s.seller='Ventas anteriores';});
 function show(id){if(activeRole==='seller'&&['cash','arqueo','users','movements','reports','products','sales'].includes(id))id='pos';document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));$('topTitle').textContent=({dashboard:'Resumen general',products:'Productos e inventario',pos:'Punto de venta',sales:'Registro de ventas',cash:'Caja',arqueo:'Arqueo y cierre',users:'Usuarios y perfiles',movements:'Movimientos de inventario',reports:'Informes'})[id]||'Proto Sport';render();renderPOS();renderCash();renderArqueo();}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.page));
-function applyRole(){activeRole=$('activeRole').value;document.querySelectorAll('[data-admin=true]').forEach(b=>b.classList.toggle('hidden',activeRole!=='admin'));$('posSeller').value=activeRole==='admin'?'Administrador demo':'Vendedor demo';if(activeRole==='seller'&&['products','movements','reports','cash','arqueo','users','sales'].includes(document.querySelector('.page:not(.hidden)')?.id))show('pos');}
+function applyRole(){
+  activeRole=$('activeRole').value;
+  const sellerMode=activeRole==='seller';
+  document.querySelectorAll('.nav button').forEach(button=>{
+    const allowed=sellerMode?button.dataset.page==='pos':true;
+    button.classList.toggle('hidden',!allowed);
+  });
+  document.querySelector('.nav').classList.toggle('seller-nav',sellerMode);
+  $('posSeller').value=sellerMode?'Vendedor demo':'Administrador demo';
+  if(sellerMode&&document.querySelector('.page:not(.hidden)')?.id!=='pos')show('pos');
+}
 $('activeRole').addEventListener('change',applyRole);
 function renderPOS(){const term=$('posSearch').value.toLowerCase();$('posProducts').innerHTML=products.filter(p=>(p.name+' '+p.ref).toLowerCase().includes(term)).map(p=>'<button class="product-tile" '+(p.stock<1?'disabled':'')+' onclick="addToCart('+p.id+')"><strong>'+p.name+'</strong><small>'+p.ref+' · '+money(p.price)+'</small><br><small>'+p.stock+' disponibles</small></button>').join('')||'<p class="muted">No hay productos que coincidan.</p>';
 $('cartItems').innerHTML=cart.length?cart.map(item=>{const p=products.find(x=>x.id===item.product);return '<div class="cart-row"><div><b>'+p.name+'</b><div class="muted">'+money(p.price)+' c/u</div></div><div class="cart-controls"><button onclick="changeCart('+p.id+',-1)">−</button><b>'+item.qty+'</b><button onclick="changeCart('+p.id+',1)">+</button><button onclick="removeCart('+p.id+')">×</button></div></div>';}).join(''):'<p class="muted">Todavía no agregas productos.</p>';
