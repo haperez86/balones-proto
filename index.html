@@ -85,7 +85,38 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   .nav button{font-size:11px;padding:9px 8px}
 }
 
-</style></head><body><div class="app"><aside class="side"><div class="brand">PROTO INVENTARIO<small>Control de almacén y ventas</small></div><nav class="nav"><button class="active" data-page="dashboard">▦ Resumen</button><button data-page="products">▣ Productos</button><button data-page="sales">＋ Registrar venta</button><button data-page="movements">⇄ Movimientos</button><button data-page="reports">▤ Informes</button></nav><p class="muted" style="color:#adc2d5;margin-top:35px">DEMO INTERACTIVA<br>Datos de ejemplo. Sin IVA ni facturación.</p></aside>
+
+/* Barra de navegación inferior estilo app móvil */
+.nav-icon{display:none}
+@media(max-width:700px){
+  body{padding-bottom:76px}
+  .side{position:fixed;z-index:50;left:0;right:0;bottom:0;width:100%;height:76px;padding:0;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -5px 18px rgba(15,23,42,.08)}
+  .side .brand,.side>.muted{display:none!important}
+  .nav{
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;
+    width:100%;height:100%;margin:0;padding:5px 3px 7px;
+    overflow:visible;white-space:normal;align-items:stretch
+  }
+  .nav button,.nav button:last-child{
+    grid-column:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;width:100%;min-width:0;min-height:0;height:100%;padding:4px 1px;
+    border:0;border-radius:8px;background:transparent;color:#64748b;
+    font-size:10px;line-height:1.1;text-align:center;white-space:normal
+  }
+  .nav button.active{background:transparent;color:#14243a;font-weight:800}
+  .nav button:hover{background:#f1f5f9}
+  .nav-icon{display:block;font-size:22px;line-height:1;font-weight:400}
+  .nav-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  main{padding-bottom:0}
+}
+
+</style></head><body><div class="app"><aside class="side"><div class="brand">PROTO INVENTARIO<small>Control de almacén y ventas</small></div><nav class="nav">
+<button class="active" data-page="dashboard"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></button>
+<button data-page="products"><span class="nav-icon">▦</span><span class="nav-label">Productos</span></button>
+<button data-page="sales"><span class="nav-icon">＋</span><span class="nav-label">Ventas</span></button>
+<button data-page="movements"><span class="nav-icon">⇄</span><span class="nav-label">Movimientos</span></button>
+<button data-page="reports"><span class="nav-icon">▤</span><span class="nav-label">Informes</span></button>
+</nav><p class="muted" style="color:#adc2d5;margin-top:35px">DEMO INTERACTIVA<br>Datos de ejemplo. Sin IVA ni facturación.</p></aside>
 <main><header class="top"><b id="topTitle">Resumen general</b><span class="tag">MODO DEMOSTRACIÓN</span></header><div class="content">
 <section id="dashboard" class="page"><div class="heading"><div><h1>Resumen del almacén</h1><div class="sub">Inventario y ventas del día.</div></div><button class="btn" onclick="show('sales')">＋ Registrar venta</button></div><div class="cards"><div class="card"><div class="metric-label">Referencias</div><div class="metric" id="mProducts">4</div></div><div class="card"><div class="metric-label">Unidades disponibles</div><div class="metric" id="mStock">232</div></div><div class="card"><div class="metric-label">Unidades vendidas hoy</div><div class="metric" id="mSold">18</div></div><div class="card"><div class="metric-label">Valor vendido hoy</div><div class="metric" id="mValue">$1.260.000</div></div></div><div class="two"><div class="panel"><h3>Existencias por referencia</h3><div class="tablewrap"><table><thead><tr><th>Producto</th><th>Referencia</th><th>Disponible</th><th>Estado</th></tr></thead><tbody id="dashRows"></tbody></table></div></div><div class="panel"><h3>Actividad de hoy</h3><div class="line"><span>Unidades vendidas</span><b id="sumUnits">18</b></div><div class="line"><span>Registros de venta</span><b id="sumCount">3</b></div><div class="line"><span>Valor vendido</span><b id="sumValue">$1.260.000</b></div><p class="notice" style="margin-top:15px">Cada venta descuenta automáticamente las unidades del inventario.</p></div></div></section>
 <section id="products" class="page hidden"><div class="heading"><div><h1>Productos e inventario</h1><div class="sub">Crea referencias y registra existencias iniciales.</div></div></div><div class="panel"><h3>Agregar producto</h3><div class="formgrid"><div class="field"><label>Nombre</label><input id="pName" placeholder="Balón fútbol #5"></div><div class="field"><label>Referencia</label><input id="pRef" placeholder="FUT-05"></div><div class="field"><label>Precio unitario (opcional)</label><input id="pPrice" type="number" min="0"></div><div class="field"><label>Inventario inicial</label><input id="pStock" type="number" min="0"></div></div><div class="actions"><button class="btn" onclick="addProduct()">Guardar producto</button></div></div><div class="panel"><h3>Inventario actual</h3><div class="tablewrap"><table><thead><tr><th>Producto</th><th>Referencia</th><th>Precio</th><th>Disponible</th><th>Estado</th></tr></thead><tbody id="productRows"></tbody></table></div></div></section>
