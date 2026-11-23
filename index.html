@@ -111,13 +111,13 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   .nav button:hover{background:#f1f5f9}
   .nav-icon{display:block;font-size:20px;line-height:1.1;font-weight:500}
   .nav-label{display:block;width:100%;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .nav.seller-nav{grid-template-columns:1fr;grid-auto-rows:1fr;align-items:center}
+  .nav.seller-nav{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch}
   .nav.seller-nav button,.nav.seller-nav button:last-child{
-    flex-direction:row;gap:10px;justify-content:center;max-width:none;
-    font-size:13px;padding:10px;height:100%
+    flex-direction:column;gap:4px;justify-content:center;max-width:none;
+    font-size:10px;padding:5px 2px;height:100%
   }
-  .nav.seller-nav .nav-icon{font-size:21px}
-  .nav.seller-nav .nav-label{width:auto;max-width:none;overflow:visible;text-overflow:clip}
+  .nav.seller-nav .nav-icon{font-size:20px}
+  .nav.seller-nav .nav-label{width:100%;max-width:100%;overflow:hidden;text-overflow:ellipsis}
   main{padding-bottom:0}
 }
 @media(max-width:380px){
@@ -135,8 +135,11 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 @media(max-width:800px){.pos-layout{grid-template-columns:1fr}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top-tools{gap:5px}.role-select{max-width:130px;font-size:11px}}
 @media(max-width:380px){.product-grid{grid-template-columns:1fr}.top-tools .tag{display:none}}
 
-/* Menú reducido para el perfil vendedor: solo acceso al punto de venta */
-@media(max-width:700px){.nav.seller-nav{grid-template-columns:1fr;justify-items:center}.nav.seller-nav button{width:100%;max-width:120px}}
+/* Menú del vendedor: Inicio y Caja (POS) */
+@media(max-width:700px){
+  .nav.seller-nav{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch}
+  .nav.seller-nav button,.nav.seller-nav button:last-child{width:100%;max-width:none}
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">PROTO INVENTARIO<small>Control de almacén y ventas</small></div><nav class="nav">
 <button class="active" data-page="dashboard"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></button>
 <button data-page="products"><span class="nav-icon">▦</span><span class="nav-label">Productos</span></button>
@@ -186,12 +189,14 @@ function applyRole(){
   activeRole=$('activeRole').value;
   const sellerMode=activeRole==='seller';
   document.querySelectorAll('.nav button').forEach(button=>{
-    const allowed=sellerMode?button.dataset.page==='pos':true;
+    const page=button.dataset.page;
+    const allowed=sellerMode?['dashboard','pos'].includes(page):true;
     button.classList.toggle('hidden',!allowed);
   });
   document.querySelector('.nav').classList.toggle('seller-nav',sellerMode);
   $('posSeller').value=sellerMode?'Vendedor demo':'Administrador demo';
-  if(sellerMode&&document.querySelector('.page:not(.hidden)')?.id!=='pos')show('pos');
+  const currentPage=document.querySelector('.page:not(.hidden)')?.id;
+  if(sellerMode&&!['dashboard','pos'].includes(currentPage))show('dashboard');
 }
 $('activeRole').addEventListener('change',applyRole);
 function renderPOS(){const term=$('posSearch').value.toLowerCase();$('posProducts').innerHTML=products.filter(p=>(p.name+' '+p.ref).toLowerCase().includes(term)).map(p=>'<button class="product-tile" '+(p.stock<1?'disabled':'')+' onclick="addToCart('+p.id+')"><strong>'+p.name+'</strong><small>'+p.ref+' · '+money(p.price)+'</small><br><small>'+p.stock+' disponibles</small></button>').join('')||'<p class="muted">No hay productos que coincidan.</p>';
